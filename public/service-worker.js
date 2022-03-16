@@ -1,5 +1,5 @@
 
-const APP_PREFIX = 'FoodFest-';
+const APP_PREFIX = 'BudgetTracker-';
 const VERSION = 'version_01';
 const CACHE_NAME = APP_PREFIX + VERSION;
 
@@ -32,7 +32,7 @@ self.addEventListener('fetch', function (e) {
     console.log('fetch request: ' + e.request.url)
     e.respondWith(
         caches.match(e.request).then(function (request) {
-            if (request) { // if chace is available, respond with cache
+            if (request) { // if cache is available, respond with cache
                 console.log('responding with cache: '+ e.request.url)
                 return request
             } else {  // if there is no cache try fetching request
