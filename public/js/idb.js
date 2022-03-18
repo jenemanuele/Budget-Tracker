@@ -1,5 +1,6 @@
-const db;
-// + Internet connection; connection to Index-db db budget_tracker and set to 1
+// create variable to hold db connection
+let db;
+// establish a connection to IDB db called 'budget_tracker' and set version to 1
 const request = indexedDb.open('budget_tracker', 1);
 
 // event starts if db version changes
@@ -35,7 +36,7 @@ function saveData(data) {
     const newObjectStore = transaction.objectStore('new_transaction');
 
      // add record to object store 
-     newObjectStore.add(data);
+    newObjectStore.add(data);
 
 }
 
@@ -67,10 +68,12 @@ function uploadTransaction() {
                 }
 
                 // to open a new transaction
-                const transaction= db.transaction.(['new_transaction'], 'readwrite');
+                const transaction= db.transaction(['new_transaction'], 'readwrite');
 
+                // get to new transaction
                 const newObjectStore = transaction.objectStore('new_transaction');
 
+                // clear items in object store
                 newObjectStore.clear();
 
                 alert('All retained transactions were added.');
@@ -83,4 +86,5 @@ function uploadTransaction() {
     }
 }
 
+// listen for app
 window.addEventListener('online', uploadTransaction);
