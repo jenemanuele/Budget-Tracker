@@ -28,6 +28,23 @@ self.addEventListener('activate', function (e) {
     )
 });
 
+self.addEventListener('activate', function (e) {
+    e.waitUntil(
+        caches.keys().then(function (keyList) {
+            let cacheKeeptask = keyList.filter(function (key) {
+                return key.indexOf(APP_PREFIX);
+            });
+            cacheKeeptask.push(CACHE_NAME);
+
+            return Promise.all(keyList.map(function (key, i) {
+                if (cacheKeeptask.indexOf(key) === -1) {
+                    console.log('deleting cache : ' + keyList[i] );
+                    return caches.delete(keyList[i]);
+                }
+            }));
+        })
+    )
+});
 self.addEventListener('fetch', function (e) {
     console.log('fetch request: ' + e.request.url)
     e.respondWith(
@@ -36,7 +53,7 @@ self.addEventListener('fetch', function (e) {
                 console.log('responding with cache: '+ e.request.url)
                 return request
             } else {  // if there is no cache try fetching request
-                console.log('file is not caced, fetching:' + e.request.url)
+                console.log('file is not cached, fetching:' + e.request.url)
                 return fetch(e.request)
             }
         })

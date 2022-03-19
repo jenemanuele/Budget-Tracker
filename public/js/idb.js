@@ -1,7 +1,9 @@
+const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB;
+
 // create variable to hold db connection
 let db;
 // establish a connection to IDB db called 'budget_tracker' and set version to 1
-const request = indexedDb.open('budget_tracker', 1);
+const request = indexedDB.open('budget_tracker', 1);
 
 // event starts if db version changes
 request.onupgradeneeded = function (event) {
@@ -74,6 +76,8 @@ function uploadTransaction() {
                 const newObjectStore = transaction.objectStore('new_transaction');
 
                 // clear items in object store
+
+
                 newObjectStore.clear();
 
                 alert('All retained transactions were added.');
