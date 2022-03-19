@@ -29,7 +29,7 @@ request.onerror = function(event) {
 };
 
 // execute if new transaction made + no internet connection
-function saveData(data) {
+function saveRecord(data) {
 
     // new transaction w/ db read & write capabilities
     const transaction = db.transaction(['new_transaction'], 'readwrite');
