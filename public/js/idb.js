@@ -1,25 +1,26 @@
-const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB;
+const indexedDB = window.indexedDB || window.mozIndexedDb || window.webkitIndexedDb;
 
 // create variable to hold db connection
 let db;
-// establish a connection to IDB db called 'budget_tracker' and set version to 1
+// establish a connection to IndexedDB database called 'budget_tracker' and set it to version 1
 const request = indexedDB.open('budget_tracker', 1);
 
-// event starts if db version changes
-request.onupgradeneeded = function (event) {
+// this event will emit if the database version changes
+request.onupgradeneeded = function(event) {
+
+    // save a reference to the database
     const db = event.target.result;
 
-    // create object store called new_transaction
+    // create an object store (table) called `new_transaction`, set it to have an auto incrementing primary key of sorts
     db.createObjectStore('new_transaction', { autoIncrement: true });
 };
-
 // when successful
 request.onsuccess = function(event) {
     db = event.target.result;
 
     // check if app online, if yes run upload
     if (navigator.onLine) {
-        // upload transaction
+        uploadTransaction();
     }
 };
 
@@ -29,7 +30,7 @@ request.onerror = function(event) {
 };
 
 // execute if new transaction made + no internet connection
-function saveRecord(data) {
+function saveRecord(record) {
 
     // new transaction w/ db read & write capabilities
     const transaction = db.transaction(['new_transaction'], 'readwrite');
@@ -38,7 +39,7 @@ function saveRecord(data) {
     const newObjectStore = transaction.objectStore('new_transaction');
 
      // add record to object store 
-    newObjectStore.add(data);
+    newObjectStore.add(record);
 
 }
 
@@ -46,18 +47,20 @@ function saveRecord(data) {
 function uploadTransaction() {
 
     // open a transaction on your db
-    const transaction = db.transaction(['new_transaction']);
+    const transaction = db.transaction(['new_transaction'], 'readwrite');
+    
+    // access your object store
     const newObjectStore = transaction.objectStore('new_transaction');
 
-    const getAllData = newObjectStore.getAllData();
+    const getAll = newObjectStore.getAll();
 
-    // received data-- send to server
-    getAllData.onsuccess = function(){
+    // received record- send to server
+    getAll.onsuccess = function() {
 
-        if (getAllData.result.length > 0 ) {
+        if (getAll.result.length > 0 ) {
             fetch('/api/transaction', {
                 method: 'POST',
-                body: JSON.stringify(getAllData.result),
+                body: JSON.stringify(getAll.result),
                 headers: {
                     Accept: 'application/json, test/plain, */*',
                     'Content-Type': 'application/json'
@@ -76,8 +79,6 @@ function uploadTransaction() {
                 const newObjectStore = transaction.objectStore('new_transaction');
 
                 // clear items in object store
-
-
                 newObjectStore.clear();
 
                 alert('All retained transactions were added.');
@@ -87,8 +88,8 @@ function uploadTransaction() {
             });
         }
 
-    }
+    };
 }
 
-// listen for app
+// listen for app coming back online
 window.addEventListener('online', uploadTransaction);
